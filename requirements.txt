@@ -1,0 +1,9 @@
+requests
+pandas
+json
+re
+os
+typing
+bs4
+scipy
+json
