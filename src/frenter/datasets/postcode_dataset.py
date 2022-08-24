@@ -27,5 +27,6 @@ class PostcodeDataset:
         :param longitude:
         :return: closest postcode to given coordinates
         """
-        return self.postcodes.iloc[cdist([(latitude, longitude)], self.postcodes_coordinates).argmin()]["pcd"].replace(
-            " ", "")
+        return self.postcodes.iloc[
+            cdist([(latitude, longitude)], self.postcodes_coordinates).argmin()
+        ]["pcd"].replace(" ", "")

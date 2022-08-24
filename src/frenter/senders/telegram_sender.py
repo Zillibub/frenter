@@ -3,6 +3,10 @@ from frenter.senders.base_sender import BaseSender
 
 
 class TelegramSender(BaseSender):
+    """
+    Hardcoded sender for telegram bot
+    Ideally it should have a full functionality but I took a few shortcuts here
+    """
 
     def __init__(
             self,

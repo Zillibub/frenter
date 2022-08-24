@@ -25,6 +25,10 @@ class Loop:
         self.timeout = timeout
 
     def _inner(self):
+        """
+        Retrieves listings reports from evaluator and feeds them to the sender
+        :return:
+        """
         listing_reports = self.evaluator.step()
 
         for listing_report in listing_reports:

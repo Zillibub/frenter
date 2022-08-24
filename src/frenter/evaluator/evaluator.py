@@ -1,22 +1,31 @@
 import json
+from typing import List, Dict
 from frenter.datasets.postcode_dataset import PostcodeDataset
 from frenter.scrappers.zoopla_scrapper import ZooplaScrapper
 from frenter.scrappers.crystalroof_scrapper import CrystalRoofScrapper
 
 
 class Evaluator:
+    """
+    Evaluates main search logic like filtering and report creation
+    """
 
     def __init__(
             self,
             filter_params,
             state_path: str,
             postcode_dataset_path: str,
-            loop_timeout: int = 5,
             pages_amount: int = 10,
     ):
+        """
+
+        :param filter_params:
+        :param state_path: path to json file with already views listings
+        :param postcode_dataset_path: path to datasets with postcodes
+        :param pages_amount: amout of pages to analyze on search
+        """
         self.filter_params = filter_params
         self.state_path = state_path
-        self.loop_timeout = loop_timeout
         self.pages_amount = pages_amount
 
         self.state = None
@@ -67,7 +76,11 @@ class Evaluator:
             "main_demographics_group": main_demographics_group,
         }
 
-    def step(self):
+    def step(self) -> List[Dict]:
+        """
+        Analyse listings
+        :return:
+        """
         listings = []
         for i in range(self.pages_amount):
             listing_short = self.property_scrapper.get_listings_page(
