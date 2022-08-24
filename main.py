@@ -1,16 +1,27 @@
-# This is a sample Python script.
+from src.frenter.loop.loop import Loop
+from src.frenter.core.settings import settings
+from src.frenter.senders.telegram_sender import TelegramSender
+from src.frenter.evaluator.evaluator import Evaluator
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
+def main():
+    loop = Loop(
+        evaluator=Evaluator(
+            filter_params={},
+            state_path="data/state.json",
+            postcode_dataset_path="data/london_postcodes-ons-postcodes-directory-feb22.csv",
+            pages_amount=5
+        ),
+        sender=TelegramSender(
+            bot_token=settings.TELEGRAM_BOT_TOKEN,
+            chat_id=settings.TELEGRAM_CHAT_ID,
+        ),
+        timeout=settings.LOOP_TIMEOUT
+    )
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    loop.run()
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    main()
