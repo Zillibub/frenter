@@ -34,6 +34,11 @@ class Evaluator:
             json.dump(self.state, f)
 
     def _filter_listing(self, listing_id: int):
+        """
+        Checks if this listing has been already checked or if it is out of interested zone.
+        :param listing_id:
+        :return:
+        """
 
         if listing_id in self.state["listing_ids"]:
             return None
@@ -57,11 +62,12 @@ class Evaluator:
         rate, main_demographics_group = self.metadata_scrapper.get_main_demographics_group(postcode)
 
         return {
+            "url": f"https://www.zoopla.co.uk/to-rent/details/{listing['listingId']}",
             "crime_rate": crime_rate,
             "main_demographics_group": main_demographics_group,
         }
 
-    def _step(self):
+    def step(self):
         listings = []
         for i in range(self.pages_amount):
             listing_short = self.property_scrapper.get_listings_page(
@@ -74,4 +80,9 @@ class Evaluator:
             listing = self._filter_listing(listing_short["listingId"])
             if listing:
                 listings.append(listing)
-        pass
+
+        listing_reports = [
+            self._get_listing_report(listing) for listing in listings
+        ]
+
+        return listing_reports
