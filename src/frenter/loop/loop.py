@@ -11,7 +11,6 @@ class Loop:
     def __init__(
             self,
             evaluator: Evaluator,
-            sender: BaseSender,
             timeout: float,
     ):
         """
@@ -21,7 +20,6 @@ class Loop:
         :param timeout:
         """
         self.evaluator = evaluator
-        self.sender = sender
         self.timeout = timeout
 
     def _inner(self):
@@ -29,10 +27,7 @@ class Loop:
         Retrieves listings reports from evaluator and feeds them to the sender
         :return:
         """
-        listing_reports = self.evaluator.step()
-
-        for listing_report in listing_reports:
-            self.sender.send(listing_report)
+        self.evaluator.step()
 
     def run(self):
         while True:

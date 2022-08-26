@@ -22,14 +22,14 @@ class CrystalRoofScrapper:
         return BeautifulSoup(report_response.content, 'html.parser')
 
     def get_crime(self, postcode):
-        report_soup = self._fetch_data(postcode, ReportType.crime.value)
+        report_soup = self._fetch_data(postcode, ReportType.crime)
         crime = json.loads(list(
             report_soup.find(id="__NEXT_DATA__").children)[0])["props"]["initialReduxState"]["report"][
             "sectionResponses"]
         return crime["crime"]["data"]["lsoastats"]["bucket"] + 1
 
     def get_transport(self, postcode):
-        report_soup = self._fetch_data(postcode, ReportType.transport.value)
+        report_soup = self._fetch_data(postcode, ReportType.transport)
         transport = json.loads(list(
             report_soup.find(id="__NEXT_DATA__").children)[0])["props"]["initialReduxState"]["report"][
             "sectionResponses"]
@@ -39,7 +39,7 @@ class CrystalRoofScrapper:
         }
 
     def get_main_demographics_group(self, postcode):
-        report_soup = self._fetch_data(postcode, ReportType.demographics.value)
+        report_soup = self._fetch_data(postcode, ReportType.demographics)
         demographics = json.loads(list(
             report_soup.find(id="__NEXT_DATA__").children)[0])["props"]["initialReduxState"]["report"][
             "sectionResponses"]

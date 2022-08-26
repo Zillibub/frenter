@@ -5,6 +5,7 @@ from typing import List, Dict
 from frenter.datasets.postcode_dataset import PostcodeDataset
 from frenter.scrappers.zoopla_scrapper import ZooplaScrapper
 from frenter.scrappers.crystalroof_scrapper import CrystalRoofScrapper
+from frenter.senders.telegram_sender import TelegramSender
 
 
 class FilterParameters(BaseModel):
@@ -25,6 +26,7 @@ class Evaluator:
             filter_params: FilterParameters,
             state_path: str,
             postcode_dataset_path: str,
+            sender: TelegramSender,
             pages_amount: int = 10,
     ):
         """
@@ -39,6 +41,7 @@ class Evaluator:
         self.pages_amount = pages_amount
 
         self.state = None
+        self.sender = sender
         self._load_state()
         self.postcode_dataset = PostcodeDataset(postcode_dataset_path)
         self.property_scrapper = ZooplaScrapper()
@@ -47,6 +50,7 @@ class Evaluator:
     def _load_state(self):
         if not os.path.exists(self.state_path):
             self.state = {"listing_ids": []}
+            return
         with open(self.state_path, "r") as f:
             self.state = json.load(f)
 
@@ -88,28 +92,25 @@ class Evaluator:
             "main_demographics_group": main_demographics_group,
         }
 
-    def step(self) -> List[Dict]:
+    def step(self):
         """
         Analyse listings
         :return:
         """
-        listings = []
         for i in range(self.pages_amount):
-            listing_short = self.property_scrapper.get_listings_page(
+            listings_short = self.property_scrapper.get_listings_page(
                 page_number=i,
                 price_min=self.filter_params.price_min,
                 price_max=self.filter_params.price_max,
                 furnished_state=self.filter_params.furnished_state,
                 beds_num=self.filter_params.beds_num,
             )
-            listing = self._filter_listing(listing_short["listingId"])
-            if listing:
-                listings.append(listing)
-                self.state["listing_ids"].append(listing["listingId"])
-                self._save_state()
-
-        listing_reports = [
-            self._get_listing_report(listing) for listing in listings
-        ]
-
-        return listing_reports
+            for listing_short in listings_short:
+                try:
+                    listing = self._filter_listing(listing_short["listingId"])
+                    if listing:
+                        self.sender.send(self._get_listing_report(listing))
+                        self.state["listing_ids"].append(listing["listingId"])
+                        self._save_state()
+                except Exception:
+                    print(f"Cannot retrieve data for crystalroof for {listing_short['listingId']}")
