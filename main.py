@@ -1,3 +1,4 @@
+import logging
 from src.frenter.loop.loop import Loop
 from src.frenter.core.settings import settings
 from src.frenter.senders.telegram_sender import TelegramSender
@@ -30,4 +31,5 @@ def main():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     main()

@@ -1,5 +1,7 @@
 import json
 import os
+import logging
+from dateutil.parser import parse
 from datetime import datetime, timedelta
 from typing import Dict
 from pydantic import BaseModel
@@ -76,12 +78,10 @@ class Evaluator:
         if listing_short["listingId"] in self.state["listing_ids"]:
             return None
 
-        published_on = listing_short["publishedOn"]
-        published_on = datetime.strptime(
-            published_on.replace("th", "").replace("st", "").replace("nd", "").replace("rd", ""), "%d %b %Y"
-        )
+        published_on = parse(listing_short["publishedOn"], fuzzy=True)
 
         if published_on < datetime.now() - timedelta(days=1):
+            self._log_listing(listing_short["listingId"])
             return None
 
         listing = self.property_scrapper.get_listing_details(listing_short["listingId"])
@@ -91,6 +91,7 @@ class Evaluator:
         )
         transport = self.metadata_scrapper.get_transport(postcode)
         if transport.zone > self.filter_params.zone:
+            self._log_listing(listing_short["listingId"])
             return None
 
         listing["postcode"] = postcode
@@ -116,6 +117,7 @@ class Evaluator:
         :return:
         """
         for i in range(self.pages_amount):
+            logging.info(f"Viewing page {i}")
             listings_short = self.property_scrapper.get_listings_page(
                 page_number=i,
                 price_min=self.filter_params.price_min,
@@ -130,8 +132,11 @@ class Evaluator:
         listing = self._filter_listing(listing_short)
         if listing:
             self.sender.send(self._get_listing_report(listing))
-            self.state["listing_ids"].append(listing["listingId"])
-            self._save_state()
+            self._log_listing(listing["listingId"])
+
+    def _log_listing(self, listing_id: int):
+        self.state["listing_ids"].append(listing_id)
+        self._save_state()
 
     def _inner(self, listing_short):
         try:
