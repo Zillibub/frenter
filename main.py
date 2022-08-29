@@ -13,7 +13,7 @@ def main():
                 price_max=1800,
                 furnished_state="furnished",
                 beds_num=1,
-                zone=2,
+                zone=,
             ),
             sender=TelegramSender(
                 bot_token=settings.TELEGRAM_BOT_TOKEN,
@@ -21,7 +21,7 @@ def main():
             ),
             state_path="data/state.json",
             postcode_dataset_path="data/london_postcodes-ons-postcodes-directory-feb22.csv",
-            pages_amount=20
+            pages_amount=5
         ),
         timeout=settings.LOOP_TIMEOUT
     )
