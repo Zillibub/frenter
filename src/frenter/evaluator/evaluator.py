@@ -1,5 +1,7 @@
 import json
 import os
+from datetime import datetime, timedelta
+from typing import Dict
 from pydantic import BaseModel
 from frenter.datasets.postcode_dataset import PostcodeDataset
 from frenter.scrappers.zoopla_scrapper import ZooplaScrapper
@@ -53,7 +55,9 @@ class Evaluator:
 
     def _load_state(self):
         if not os.path.exists(self.state_path):
-            self.state = {"listing_ids": []}
+            self.state = {
+                "listing_ids": []
+            }
             return
         with open(self.state_path, "r") as f:
             self.state = json.load(f)
@@ -62,17 +66,25 @@ class Evaluator:
         with open(self.state_path, "w") as f:
             json.dump(self.state, f)
 
-    def _filter_listing(self, listing_id: int):
+    def _filter_listing(self, listing_short: Dict):
         """
         Checks if this listing has been already checked or if it is out of interested zone.
-        :param listing_id:
+        :param listing_short:
         :return:
         """
 
-        if listing_id in self.state["listing_ids"]:
+        if listing_short["listingId"] in self.state["listing_ids"]:
             return None
 
-        listing = self.property_scrapper.get_listing_details(listing_id)
+        published_on = listing_short["publishedOn"]
+        published_on = datetime.strptime(
+            published_on.replace("th", "").replace("st", "").replace("nd", "").replace("rd", ""), "%d %b %Y"
+        )
+
+        if published_on < datetime.now() - timedelta(days=1):
+            return None
+
+        listing = self.property_scrapper.get_listing_details(listing_short["listingId"])
         postcode = self.postcode_dataset.find_postcode_by_coordinate(
             latitude=listing["location"]["coordinates"]["latitude"],
             longitude=listing["location"]["coordinates"]["longitude"]
@@ -93,7 +105,7 @@ class Evaluator:
         return {
             "url": f"https://www.zoopla.co.uk/to-rent/details/{listing['listingId']}",
             "crime rate": crime_rate.crime_rate,
-            "crime count": "".join([f"\t{key}: {value}\n" for key, value in crime_rate.crime_count]),
+            "crime count": "".join([f"\t{key}: {value}\n" for key, value in crime_rate.crime_count.items()]),
             "main group": demographics_report.main_group,
             "ptal": listing["ptal"]
         }
@@ -115,7 +127,7 @@ class Evaluator:
                 self._inner_method(listing_short)
 
     def _debug_inner(self, listing_short):
-        listing = self._filter_listing(listing_short["listingId"])
+        listing = self._filter_listing(listing_short)
         if listing:
             self.sender.send(self._get_listing_report(listing))
             self.state["listing_ids"].append(listing["listingId"])
@@ -125,4 +137,4 @@ class Evaluator:
         try:
             self._debug_inner(listing_short)
         except Exception as e:
-            print(f"Cannot retrieve data for crystalroof for {listing_short['listingId']}, got {e}")
+            print(f"Cannot retrieve data for {listing_short['listingId']}, got {e}")

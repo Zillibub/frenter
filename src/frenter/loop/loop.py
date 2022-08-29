@@ -1,6 +1,6 @@
+import logging
 from time import sleep
 from frenter.evaluator.evaluator import Evaluator
-from frenter.senders.base_sender import BaseSender
 
 
 class Loop:
@@ -16,7 +16,6 @@ class Loop:
         """
 
         :param evaluator:
-        :param sender:
         :param timeout:
         """
         self.evaluator = evaluator
@@ -31,5 +30,6 @@ class Loop:
 
     def run(self):
         while True:
+            logging.info("Starting iteration")
             self._inner()
             sleep(self.timeout)

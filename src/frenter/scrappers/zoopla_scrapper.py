@@ -34,7 +34,7 @@ class ZooplaScrapper:
             f"&beds_min={beds_num}&price_min={price_min}&price_max={price_max}"
             f"&furnished_state={furnished_state}&pn={page_number}")
         if listings_response.status_code != 200:
-            raise ValueError(f"Status code{listings_response.status_code} for listing details")
+            raise ValueError(f"Status code {listings_response.status_code} for listing details {listings_response.content}")
         listings_soup = BeautifulSoup(listings_response.content, 'html.parser')
         return json.loads(
             list(listings_soup.find(id="__NEXT_DATA__").children)[0])["props"]["pageProps"]["initialProps"][
