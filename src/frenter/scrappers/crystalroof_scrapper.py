@@ -41,7 +41,7 @@ class CrystalRoofScrapper:
     def _fetch_data(self, postcode: str, report_type: ReportType) -> BeautifulSoup:
         report_response = requests.get(f"{self.base_url}/report/postcode/{postcode}/{report_type.value}")
         if report_response.status_code != 200:
-            raise ValueError()
+            raise ValueError(f"Status code {report_response.status_code}, {report_response.content}")
         return BeautifulSoup(report_response.content, 'html.parser')
 
     def get_crime(self, postcode) -> CrimeReport:

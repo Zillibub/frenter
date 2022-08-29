@@ -47,9 +47,9 @@ class Evaluator:
         self.metadata_scrapper = CrystalRoofScrapper()
 
         if os.getenv("DEBUG", False):
-            self._inner_method = self._inner
-        else:
             self._inner_method = self._debug_inner
+        else:
+            self._inner_method = self._inner
 
     def _load_state(self):
         if not os.path.exists(self.state_path):
@@ -93,7 +93,7 @@ class Evaluator:
         return {
             "url": f"https://www.zoopla.co.uk/to-rent/details/{listing['listingId']}",
             "crime rate": crime_rate.crime_rate,
-            "crime count": crime_rate.crime_count,
+            "crime count": "".join([f"\t{key}: {value}\n" for key, value in crime_rate.crime_count]),
             "main group": demographics_report.main_group,
             "ptal": listing["ptal"]
         }
