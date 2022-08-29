@@ -46,6 +46,11 @@ class Evaluator:
         self.property_scrapper = ZooplaScrapper()
         self.metadata_scrapper = CrystalRoofScrapper()
 
+        if os.getenv("DEBUG", False):
+            self._inner_method = self._inner
+        else:
+            self._inner_method = self._debug_inner
+
     def _load_state(self):
         if not os.path.exists(self.state_path):
             self.state = {"listing_ids": []}
@@ -107,11 +112,17 @@ class Evaluator:
                 beds_num=self.filter_params.beds_num,
             )
             for listing_short in listings_short:
-                try:
-                    listing = self._filter_listing(listing_short["listingId"])
-                    if listing:
-                        self.sender.send(self._get_listing_report(listing))
-                        self.state["listing_ids"].append(listing["listingId"])
-                        self._save_state()
-                except Exception:
-                    print(f"Cannot retrieve data for crystalroof for {listing_short['listingId']}")
+                self._inner_method(listing_short)
+
+    def _debug_inner(self, listing_short):
+        listing = self._filter_listing(listing_short["listingId"])
+        if listing:
+            self.sender.send(self._get_listing_report(listing))
+            self.state["listing_ids"].append(listing["listingId"])
+            self._save_state()
+
+    def _inner(self, listing_short):
+        try:
+            self._debug_inner(listing_short)
+        except Exception as e:
+            print(f"Cannot retrieve data for crystalroof for {listing_short['listingId']}, got {e}")

@@ -23,8 +23,8 @@ class TransportReport(BaseModel):
 
 
 class DemographicReport(BaseModel):
-    rate: Dict[str, int]
-    main_group: Dict[str, int]
+    rate: Dict[str, float]
+    main_group: Dict[str, float]
 
 
 class CrystalRoofScrapper:
@@ -35,7 +35,7 @@ class CrystalRoofScrapper:
             8: "robbery",
             14: "other theft",
             10: "theft from the person",
-            3: "theft from the person"
+            3: "bulgary"
         }
 
     def _fetch_data(self, postcode: str, report_type: ReportType) -> BeautifulSoup:
@@ -65,7 +65,7 @@ class CrystalRoofScrapper:
             "sectionResponses"]
         return TransportReport(
             zone=transport["transport"]["data"]["zone"],
-            ptal=transport["transport"]["data"]["ptal"]
+            ptal=transport["transport"]["data"]["ptal"]["ptal"]
         )
 
     def get_main_demographics_group(self, postcode) -> DemographicReport:

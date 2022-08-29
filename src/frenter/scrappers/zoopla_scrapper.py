@@ -48,7 +48,7 @@ class ZooplaScrapper:
         """
         listing_response = requests.get(f"{self.base_url}/to-rent/details/{listing_id}")
         if listing_response.status_code != 200:
-            raise ValueError(f"Status code{listing_response.status_code} for listing details")
+            raise ValueError(f"Status code {listing_response.status_code} for listing details")
 
         listing_soup = BeautifulSoup(listing_response.content, 'html.parser')
         return json.loads(list(listing_soup.find(id="__NEXT_DATA__").children)[0])["props"]["pageProps"][
