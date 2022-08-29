@@ -1,7 +1,6 @@
 import json
 import os
 from pydantic import BaseModel
-from typing import List, Dict
 from frenter.datasets.postcode_dataset import PostcodeDataset
 from frenter.scrappers.zoopla_scrapper import ZooplaScrapper
 from frenter.scrappers.crystalroof_scrapper import CrystalRoofScrapper
@@ -74,22 +73,24 @@ class Evaluator:
             longitude=listing["location"]["coordinates"]["longitude"]
         )
         transport = self.metadata_scrapper.get_transport(postcode)
-        if transport["zone"] > self.filter_params.zone:
+        if transport.zone > self.filter_params.zone:
             return None
 
         listing["postcode"] = postcode
+        listing["ptal"] = transport.ptal
 
         return listing
 
     def _get_listing_report(self, listing):
         postcode = listing["postcode"]
         crime_rate = self.metadata_scrapper.get_crime(postcode)
-        rate, main_demographics_group = self.metadata_scrapper.get_main_demographics_group(postcode)
-
+        demographics_report = self.metadata_scrapper.get_main_demographics_group(postcode)
         return {
             "url": f"https://www.zoopla.co.uk/to-rent/details/{listing['listingId']}",
-            "crime_rate": crime_rate,
-            "main_demographics_group": main_demographics_group,
+            "crime rate": crime_rate.crime_rate,
+            "crime count": crime_rate.crime_count,
+            "main group": demographics_report.main_group,
+            "ptal": listing["ptal"]
         }
 
     def step(self):
