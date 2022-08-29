@@ -13,7 +13,7 @@ def main():
                 price_max=1800,
                 furnished_state="furnished",
                 beds_num=1,
-                zone=,
+                zone=2,
             ),
             sender=TelegramSender(
                 bot_token=settings.TELEGRAM_BOT_TOKEN,
