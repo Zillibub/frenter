@@ -1,7 +1,9 @@
 import json
 import requests
+from pydantic import BaseModel
 from enum import Enum
 from bs4 import BeautifulSoup
+from typing import Dict
 
 
 class ReportType(Enum):
@@ -10,10 +12,31 @@ class ReportType(Enum):
     crime = "crime"
 
 
+class CrimeReport(BaseModel):
+    crime_rate: int
+    crime_count: Dict[str, int]
+
+
+class TransportReport(BaseModel):
+    zone: int
+    ptal: str
+
+
+class DemographicReport(BaseModel):
+    rate: Dict[str, int]
+    main_group: Dict[str, int]
+
+
 class CrystalRoofScrapper:
 
     def __init__(self):
         self.base_url: str = "https://crystalroof.co.uk"
+        self.crime_type_mapping = {
+            8: "robbery",
+            14: "other theft",
+            10: "theft from the person",
+            3: "theft from the person"
+        }
 
     def _fetch_data(self, postcode: str, report_type: ReportType) -> BeautifulSoup:
         report_response = requests.get(f"{self.base_url}/report/postcode/{postcode}/{report_type.value}")
@@ -21,24 +44,31 @@ class CrystalRoofScrapper:
             raise ValueError()
         return BeautifulSoup(report_response.content, 'html.parser')
 
-    def get_crime(self, postcode):
+    def get_crime(self, postcode) -> CrimeReport:
         report_soup = self._fetch_data(postcode, ReportType.crime)
         crime = json.loads(list(
             report_soup.find(id="__NEXT_DATA__").children)[0])["props"]["initialReduxState"]["report"][
             "sectionResponses"]
-        return crime["crime"]["data"]["lsoastats"]["bucket"] + 1
+        return CrimeReport(
+            crime_rate=crime["crime"]["data"]["lsoastats"]["bucket"] + 1,
+            crime_count={
+                self.crime_type_mapping[x["type"]]: x["count"]
+                for x in crime["crime"]["data"]["crimes_count"]
+                if x["type"] in self.crime_type_mapping.keys()
+            }
+        )
 
-    def get_transport(self, postcode):
+    def get_transport(self, postcode) -> TransportReport:
         report_soup = self._fetch_data(postcode, ReportType.transport)
         transport = json.loads(list(
             report_soup.find(id="__NEXT_DATA__").children)[0])["props"]["initialReduxState"]["report"][
             "sectionResponses"]
-        return {
-            "zone": transport["transport"]["data"]["zone"],
-            "ptal": transport["transport"]["data"]["ptal"],
-        }
+        return TransportReport(
+            zone=transport["transport"]["data"]["zone"],
+            ptal=transport["transport"]["data"]["ptal"]
+        )
 
-    def get_main_demographics_group(self, postcode):
+    def get_main_demographics_group(self, postcode) -> DemographicReport:
         report_soup = self._fetch_data(postcode, ReportType.demographics)
         demographics = json.loads(list(
             report_soup.find(id="__NEXT_DATA__").children)[0])["props"]["initialReduxState"]["report"][
@@ -47,5 +77,7 @@ class CrystalRoofScrapper:
         rate = {x: y / total for x, y in demographics["demographics"]["data"]["ethnicgroup_ward"].items() if
                 x != "total"}
         max_keys = [key for key, value in rate.items() if value == max(rate.values())][0]
-
-        return rate, {max_keys: round(rate[max_keys], 2)}
+        return DemographicReport(
+            rate=rate,
+            main_group={max_keys: round(rate[max_keys], 2)}
+        )
