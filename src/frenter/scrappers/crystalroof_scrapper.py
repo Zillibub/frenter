@@ -38,7 +38,7 @@ class CrystalRoofScrapper:
             8: "robbery",
             14: "other theft",
             10: "theft from the person",
-            3: "bulgary"
+            3: "burglary"
         }
 
     def _fetch_data(self, postcode: str, report_type: ReportType) -> BeautifulSoup:
