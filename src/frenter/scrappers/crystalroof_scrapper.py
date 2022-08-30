@@ -45,6 +45,11 @@ class CrystalRoofScrapper:
         return BeautifulSoup(report_response.content, 'html.parser')
 
     def get_crime(self, postcode) -> CrimeReport:
+        """
+        Creates crime report
+        :param postcode:
+        :return:
+        """
         report_soup = self._fetch_data(postcode, ReportType.crime)
         crime = json.loads(list(
             report_soup.find(id="__NEXT_DATA__").children)[0])["props"]["initialReduxState"]["report"][
