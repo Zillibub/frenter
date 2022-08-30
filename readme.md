@@ -15,4 +15,5 @@ Pipeline:
 The first thing to do - download [London postcodes dataset](https://data.london.gov.uk/download/postcode-directory-for-london/62b22f3f-25c5-4dd0-a9eb-06e2d8681ef1/london_postcodes-ons-postcodes-directory-feb22.csv) 
 from this url to data folder.
 
-Then you'll need a python 
+Then you'll need a python and a created telegram bot
+
