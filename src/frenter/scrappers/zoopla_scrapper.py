@@ -15,6 +15,7 @@ class ZooplaScrapper:
     def get_listings_page(
             self,
             page_number: int,
+            page_size: int,
             price_min: int,
             price_max: int,
             furnished_state: str = "furnished",
@@ -23,6 +24,7 @@ class ZooplaScrapper:
         """
 
         :param page_number:
+        :param page_size:
         :param price_min:
         :param price_max:
         :param furnished_state:
@@ -30,11 +32,13 @@ class ZooplaScrapper:
         :return: list of all regular listings for this page
         """
         listings_response = requests.get(
-            f"{self.base_url}/to-rent/property/london/?price_frequency=per_month&q=London&search_source=home"
+            f"{self.base_url}/to-rent/property/london/?price_frequency=per_month&q=London&search_source=to-rent"
+            f"&results_sort=newest_listings&page_size={page_size}"
             f"&beds_min={beds_num}&price_min={price_min}&price_max={price_max}"
             f"&furnished_state={furnished_state}&pn={page_number}")
         if listings_response.status_code != 200:
-            raise ValueError(f"Status code {listings_response.status_code} for listing details {listings_response.content}")
+            raise ValueError(
+                f"Status code {listings_response.status_code} for listing details {listings_response.content}")
         listings_soup = BeautifulSoup(listings_response.content, 'html.parser')
         return json.loads(
             list(listings_soup.find(id="__NEXT_DATA__").children)[0])["props"]["pageProps"]["initialProps"][

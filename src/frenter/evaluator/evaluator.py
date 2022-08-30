@@ -30,7 +30,8 @@ class Evaluator:
             state_path: str,
             postcode_dataset_path: str,
             sender: TelegramSender,
-            pages_amount: int = 10,
+            page_size: int = 100,
+            pages_amount: int = 2,
     ):
         """
 
@@ -42,6 +43,7 @@ class Evaluator:
         self.filter_params = filter_params
         self.state_path = state_path
         self.pages_amount = pages_amount
+        self.page_size = page_size
 
         self.state = None
         self.sender = sender
@@ -120,6 +122,7 @@ class Evaluator:
             logging.info(f"Viewing page {i}")
             listings_short = self.property_scrapper.get_listings_page(
                 page_number=i,
+                page_size=self.page_size,
                 price_min=self.filter_params.price_min,
                 price_max=self.filter_params.price_max,
                 furnished_state=self.filter_params.furnished_state,
