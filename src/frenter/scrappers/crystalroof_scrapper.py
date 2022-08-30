@@ -28,6 +28,9 @@ class DemographicReport(BaseModel):
 
 
 class CrystalRoofScrapper:
+    """
+    Retrieves data from crystalroof
+    """
 
     def __init__(self):
         self.base_url: str = "https://crystalroof.co.uk"
