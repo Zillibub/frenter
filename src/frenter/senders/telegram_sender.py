@@ -13,6 +13,12 @@ class TelegramSender(BaseSender):
             bot_token,
             chat_id,
     ):
+        """
+
+        :param bot_token:
+        :param chat_id: can be retrieved by sending a message to the bot and reading it by request
+
+        """
         self._bot_token = bot_token
         self._chat_id = chat_id
         self._base_url = "https://api.telegram.org"
