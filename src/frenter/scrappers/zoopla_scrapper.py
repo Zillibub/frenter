@@ -35,7 +35,7 @@ class ZooplaScrapper:
             f"{self.base_url}/to-rent/property/london/?price_frequency=per_month&q=London&search_source=to-rent"
             f"&results_sort=newest_listings&page_size={page_size}"
             f"&beds_min={beds_num}&price_min={price_min}&price_max={price_max}"
-            f"&furnished_state={furnished_state}&pn={page_number}")
+            f"&furnished_state={furnished_state}&pn={page_number}&search_source=refine")
         if listings_response.status_code != 200:
             raise ValueError(
                 f"Status code {listings_response.status_code} for listing details {listings_response.content}")
