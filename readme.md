@@ -10,7 +10,7 @@ Pipeline:
 3. Map crime rate and other metadata  by zip code
 4. Send a report with the url to the messenger
 
-Samble bot response: 
+Sample bot response: 
 
 ![Sample](docs/images/example.png)
 
