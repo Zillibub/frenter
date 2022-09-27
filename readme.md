@@ -10,6 +10,10 @@ Pipeline:
 3. Map crime rate and other metadata  by zip code
 4. Send a report with the url to the messenger
 
+Samble bot response: 
+
+![Sample](docs/images/example.png)
+
 # Quick start
 
 For now start is a bit tricky, I created it mostly for myself, so you'll 
@@ -18,7 +22,7 @@ need to perform some dev-like actions.
 ### Step 1 download postcodes dataset
 
 The first thing to do - download [London postcodes dataset](https://data.london.gov.uk/download/postcode-directory-for-london/62b22f3f-25c5-4dd0-a9eb-06e2d8681ef1/london_postcodes-ons-postcodes-directory-feb22.csv) 
-from this url to data folder.
+from this url to data folder.A
 
 ### Step 2 Create telegram bot
 
