@@ -47,7 +47,8 @@ wget -P data https://data.london.gov.uk/download/postcode-directory-for-london/6
 
 Go to [@BotFather](https://t.me/BotFather) in telegram and follow its instructions. 
 
-You'll get a `TELEGRAM_BOT_TOKEN` which is required to start this app.
+You'll get a `TELEGRAM_BOT_TOKEN` which is required to start this app. Do not forget to press `/start` to allow it to 
+send you messages.
 
 ### Step 4. Get your chat id 
 
