@@ -28,4 +28,4 @@ class TelegramSender(BaseSender):
             f"{self._base_url}/bot{self._bot_token}/sendMessage", json={'chat_id': self._chat_id, 'text': message}
         )
         if response.status_code != 200:
-            raise ValueError(f"Status code {response.status_code} on telegram bot sending")
+            raise ValueError(f"Status code {response.status_code} on telegram bot sending: {response.content}")
